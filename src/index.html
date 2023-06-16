@@ -10,8 +10,8 @@
   <body>
     <main>
       <h1>Jianw SWA in Private Host - 2304211349</h1>
-      <h1>This SWA site in private environment to test web , api and database. proud-rock-068b31b0a.jianwswa1.com</h1>
-      <p>Test stream with this repo on 20230616</p>
+      <p>This SWA site in private environment to test web , api and database. proud-rock-068b31b0a.jianwswa1.com</p>
+      <p>Test stream with this repo on 20230616 <a href="streamcall.html">stream api</a></p>
       <p>Loading content from the API: <b id="message"></b></b></p>
       <div>
         <a href="/data-api/rest/Person">View Data Api</a>
@@ -24,7 +24,14 @@
       let response = await fetch(`api/message`);
       let message = await response.json();
 
-      document.querySelector("#message").innerHTML = message.text
+      if(message.text)
+      {
+        document.querySelector("#message").innerHTML = message.text;
+      }
+      else
+      {
+        document.querySelector("#message").innerHTML = message;          
+      }
     })();
   </script>
 </html>
