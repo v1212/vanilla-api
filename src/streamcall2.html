@@ -1,0 +1,47 @@
+<script type="text/javascript">
+
+    async function f(url) {
+        try {
+            //var url = 'http://localhost:7071/';
+            var response = await fetch(url + "api/Function3", {
+                method: "GET",
+            });
+            if (!response.body) {
+                console.log("response body is null");
+            }
+            else {
+                var reader = response.body.getReader();
+                var reads = 0;
+                var responseMessage = "";
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                    var _a = await reader.read(), done = _a.done, value = _a.value;
+                    if (done) {
+                        var fragment_1 = new TextDecoder("utf-8").decode(value);
+                        console.log("fragment #".concat(++reads), fragment_1);
+                        responseMessage += fragment_1;
+                        break;
+                    }
+                    var fragment = new TextDecoder("utf-8").decode(value);
+                    console.log("fragment #".concat(++reads), fragment);
+                    responseMessage += fragment;
+                }
+                console.log("done in ".concat(reads, " reads"));
+            }
+        }
+        catch (error) {
+            console.error("Error happened:", error);
+        }
+    }
+
+    var url = 'http://localhost:7071/';
+    //url = 'http://localhost:7177/';
+     url = 'https://functionapp210824.azurewebsites.net/'; 
+    // url = "https://proud-rock-068b31b0a.jianwswa1.com/";
+    f(url)
+
+</script>
+
+
+this is test of javascript to call stream api.
+
