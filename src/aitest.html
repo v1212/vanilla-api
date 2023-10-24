@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Calibri', sans-serif;
+            font-size: 16px;
+        }
+
+        code {
+            white-space: pre-wrap !important;       /* Since CSS 2.1 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <div>
+        <div style="width: 95%;margin: 0 auto;">
+            <h1 style="color: rgb(0, 120, 212);font:italic;">AI Test in Static Web App</h1>
+        </div>
+
+        <div style="border-top: 2px solid red; width: 95%;margin: 0 auto; display: none;">
+        </div>
+        <div style="text-align: center; width: 96%; margin: 0 auto; margin-bottom: 20px; margin-top: 10px;">
+            <input type="text" id="myAsk" placeholder="Type your question here"
+                style="width: 95%; height: 30px; overflow:auto;">
+            <button onclick="sendPost()" style="height: 30px; border: none; margin-left: 5px;"><i class="fas fa-paper-plane fa-lg"></i></button>
+        </div>
+
+        <div style="border-top: 2px solid gray; width: 95%; margin: 0 auto;">
+            Here below comes Azure OpenAI response :
+        </div>
+        <div style="text-align: center;display: none;">
+            <textarea id="responseBox" rows="45" style="width: 95%; height: auto; overflow:auto; margin-top: 10px;">
+            </textarea>
+        </div>
+        <div style="width: 95%;margin: 0 auto; text-align: left;display: none;">
+            <pre>
+                <code id="myCode" class="language-javascript">
+                </code>
+            </pre>
+        </div>
+        <div id="dynamicdiv" style="width: 95%;margin: 0 auto; text-align: left;background-color: rgb(245,242,240);"></div>
+
+        <div id="footer" style="width: 95%;margin: 0 auto; text-align: right; font-size: small; font: italic;">This is testing <a href="https://azure.microsoft.com/en-us/products/ai-services/openai-service" target="_blank">Azure OpenAI</a> in <a href="https://azure.microsoft.com/en-us/products/app-service/static" target="_blank">Azure Static Web App</a> (non conversational chat).</div>
+    </div>
+
+    <script>
+        var defaultOutput = `using System;
+
+class Program 
+{
+    static void Main(string[] args) 
+    {
+        Console.WriteLine("Hello, world!");
+    }
+}`;
+        document.getElementById("dynamicdiv").innerHTML = "<pre><code id='dynamicCode' class='language-javascript'>" + defaultOutput + "</code></pre>";
+      </script>
+
+    <script>
+        // Get the input box
+        var input = document.getElementById("myAsk");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function (event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                // Cancel the default action, if needed
+                //event.preventDefault();
+                // Call the function
+                sendPost();
+            }
+        });
+
+        // Define the function
+        function myFunction() {
+            alert("Enter key was pressed!");
+        }
+
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+
+            return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+        }
+    </script>
+
+    <script>
+        async function sendPost() {
+            // Get the input value
+            var inputValue = document.getElementById('myAsk').value;
+
+            // The URL of the API you want to call
+            var url = 'http://localhost:7071/';
+            url = 'https://functionapp210824.azurewebsites.net/';
+            url = "https://proud-rock-068b31b0a.jianwswa1.com/";
+
+            // The data you want to POST
+            const data = { Question: inputValue };
+            try {
+                const response = await fetch(url + "api/AskAi", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.body) {
+                    console.log("response body is null");
+                }
+                else {
+                    var reader = response.body.getReader();
+                    var reads = 0;
+                    var content = "";
+                    var codeSnippet = 'function helloWorld() {\n    console.log("Hello, World!");\n}';
+                    document.getElementById('responseBox').value = "";
+                    document.getElementById('myCode').innerText = "";
+                    // eslint-disable-next-line no-constant-condition
+                    while (true) {
+                        console.log("proceed ".concat(reads++, " reads"));
+                        var _a = await reader.read(), done = _a.done, value = _a.value;
+                        
+                        if (done) {
+                            var fragment_1 = new TextDecoder("utf-8").decode(value);
+                            content += fragment_1;
+                            document.getElementById('responseBox').value += fragment_1;
+                            document.getElementById('dynamicCode').innerHTML = content;
+                            //document.getElementById("responsePre").textContent = codeSnippet;
+                            Prism.highlightAll();
+
+                            break;
+                        }
+                        var fragment = new TextDecoder("utf-8").decode(value);
+                        content += fragment;
+                        document.getElementById('responseBox').value += fragment;
+                        document.getElementById('dynamicCode').innerHTML = content;
+                    }
+                    Prism.highlightAll();
+                }
+            }
+            catch (error) {
+                console.error("Error happened:", error);
+            }
+
+            console.log(data);
+        }
+    </script>
+
+</body>
+
+</html>
