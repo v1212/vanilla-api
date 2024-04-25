@@ -5,5 +5,4 @@
 
 This repo is used as a starter for a _very basic_ web application with an API.
 
-// This is SWA site in private environment to test web, api and database. 
-// https://proud-rock-068b31b0a.jianwswa1.com  
+// This is SWA site in dedicated euap dm1
